@@ -1,4 +1,4 @@
-package com.dicoding.picodiploma.loginwithanimation.ui.story
+package com.dicoding.picodiploma.loginwithanimation.ui.home
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,40 +8,52 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.dicoding.picodiploma.loginwithanimation.data.pref.dataStore
-import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityStoriesBinding
+import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityHomeBinding
 import com.dicoding.picodiploma.loginwithanimation.ui.ViewModelFactory
+import com.dicoding.picodiploma.loginwithanimation.ui.story.AddStories
+import com.dicoding.picodiploma.loginwithanimation.ui.story.StoriesAdapter
 import com.dicoding.picodiploma.loginwithanimation.ui.welcome.WelcomeActivity
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class StoriesActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityStoriesBinding
-    private lateinit var storiesViewModel: StoriesViewModel
+    private lateinit var binding: ActivityHomeBinding
+    private lateinit var homeViewModel: HomeViewModel
     private lateinit var storiesAdapter: StoriesAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityStoriesBinding.inflate(layoutInflater)
+        binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.rvStory.layoutManager = LinearLayoutManager(this)
         storiesAdapter = StoriesAdapter()
         binding.rvStory.adapter = storiesAdapter
 
-        storiesViewModel =
-            ViewModelProvider(this, ViewModelFactory(this)).get(StoriesViewModel::class.java)
+        homeViewModel =
+            ViewModelProvider(this, ViewModelFactory(this)).get(HomeViewModel::class.java)
 
         binding.logoutNavigate.setOnClickListener {
             logoutUser()
         }
 
-        binding.fabAddStory.setOnClickListener{
+        binding.fabAddStory.setOnClickListener {
             val intent = Intent(this, AddStories::class.java)
             startActivity(intent)
         }
+
+        lifecycleScope.launch {
+            homeViewModel.pagedStories.collectLatest { pagingData ->
+                storiesAdapter.submitData(pagingData)
+            }
+        }
+
 
         storiesAdapter.addLoadStateListener { loadState ->
             when {
@@ -63,8 +75,6 @@ class StoriesActivity : AppCompatActivity() {
                 }
             }
         }
-
-
     }
 
     override fun onCreateOptionsMenu(menu: android.view.Menu?): Boolean {
@@ -82,9 +92,9 @@ class StoriesActivity : AppCompatActivity() {
             val userPreference = UserPreference.getInstance(applicationContext.dataStore)
             userPreference.clearToken()
 
-            storiesViewModel.logout()
+            homeViewModel.logout()
 
-            val intent = Intent(this@StoriesActivity, WelcomeActivity::class.java)
+            val intent = Intent(this@HomeActivity, WelcomeActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()

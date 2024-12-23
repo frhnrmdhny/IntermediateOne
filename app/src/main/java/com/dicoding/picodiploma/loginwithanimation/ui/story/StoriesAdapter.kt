@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dicoding.picodiploma.loginwithanimation.data.remote.response.ListStoryItem
-import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityStoriesBinding
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityStoriesDetailBinding
 
 class StoriesAdapter :
@@ -43,6 +42,7 @@ class StoriesAdapter :
                 intent.putExtra("story_id", story.id)
                 binding.root.context.startActivity(intent)
             }
+
         }
     }
 

@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
-class StoryRepository private constructor(
+class StoriesRepository private constructor(
     private val storiesApiService: ApiService,
     private val userPreference: UserPreference,
 ) {
@@ -34,7 +34,7 @@ class StoryRepository private constructor(
             storyResponse.listStory
 
         } catch (e: Exception) {
-            Log.e("StoryRepository", "Error fetching stories", e)
+            Log.e("StoriesRepository", "Error fetching stories", e)
             throw Exception("Error fetching stories: ${e.message}")
         }
     }
@@ -54,7 +54,7 @@ class StoryRepository private constructor(
             val response = storiesApiService.getStoryDetail(id)
             response.story
         } catch (e: Exception) {
-            Log.e("StoryRepository", "Error fetching stories", e)
+            Log.e("StoriesRepository", "Error fetching stories", e)
             throw Exception("Error fetching stories: ${e.message}")
         }
     }
@@ -64,6 +64,6 @@ class StoryRepository private constructor(
             storyApiService: ApiService,
             userPreference: UserPreference,
         ):
-                StoryRepository = StoryRepository(storyApiService, userPreference)
+                StoriesRepository = StoriesRepository(storyApiService, userPreference)
     }
 }

@@ -1,7 +1,7 @@
 package com.dicoding.picodiploma.loginwithanimation.di
 
 import android.content.Context
-import com.dicoding.picodiploma.loginwithanimation.data.StoryRepository
+import com.dicoding.picodiploma.loginwithanimation.data.StoriesRepository
 import com.dicoding.picodiploma.loginwithanimation.data.UserRepository
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserPreference
 import com.dicoding.picodiploma.loginwithanimation.data.pref.dataStore
@@ -17,11 +17,11 @@ object Injection {
         return UserRepository.getInstance(pref, apiService)
     }
 
-    fun provideStoryRepository(context: Context): StoryRepository {
+    fun provideStoryRepository(context: Context): StoriesRepository {
         val pref = UserPreference.getInstance(context.dataStore)
         val token = runBlocking { pref.getSession().first().token }
             ?: throw IllegalStateException("Token is null. Please ensure the user is logged in.")
         val apiService = ApiConfig.getStoryApiService(token)
-        return StoryRepository.getInstance(apiService, pref)
+        return StoriesRepository.getInstance(apiService, pref)
     }
 }

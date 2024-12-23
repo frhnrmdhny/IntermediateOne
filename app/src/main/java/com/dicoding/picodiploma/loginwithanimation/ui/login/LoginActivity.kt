@@ -1,5 +1,6 @@
 package com.dicoding.picodiploma.loginwithanimation.ui.login
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -16,7 +17,7 @@ import com.dicoding.picodiploma.loginwithanimation.data.remote.Results
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityLoginBinding
 import com.dicoding.picodiploma.loginwithanimation.ui.AuthenticationViewModel
 import com.dicoding.picodiploma.loginwithanimation.ui.ViewModelFactory
-import com.dicoding.picodiploma.loginwithanimation.ui.story.StoriesActivity
+import com.dicoding.picodiploma.loginwithanimation.ui.home.HomeActivity
 
 class LoginActivity : AppCompatActivity() {
 
@@ -35,6 +36,8 @@ class LoginActivity : AppCompatActivity() {
 
         setupView()
         setupAction()
+        playAnimation()
+
 
         loginView.getUserSession { userSession ->
             userSession?.let {
@@ -45,6 +48,14 @@ class LoginActivity : AppCompatActivity() {
                 binding.passwordEditText.setText("")
             }
         }
+    }
+
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 4000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
     }
 
     private fun setupView() {
@@ -103,7 +114,7 @@ class LoginActivity : AppCompatActivity() {
                             setTitle(getString(R.string.msg_title))
                             setMessage(getString(R.string.msg_desc))
                             setPositiveButton(getString(R.string.msg_button)) { _, _ ->
-                                val intent = Intent(this@LoginActivity, StoriesActivity::class.java)
+                                val intent = Intent(this@LoginActivity, HomeActivity::class.java)
                                 intent.flags =
                                     Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                                 startActivity(intent)

@@ -20,6 +20,8 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityAddStoriesBinding
 import com.dicoding.picodiploma.loginwithanimation.ui.ViewModelFactory
+import com.dicoding.picodiploma.loginwithanimation.ui.home.HomeActivity
+import com.dicoding.picodiploma.loginwithanimation.ui.home.HomeViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -31,17 +33,19 @@ class AddStories : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddStoriesBinding
     private lateinit var viewModel: StoriesDetailViewModel
-    private lateinit var storiesViewModel: StoriesViewModel
+    private lateinit var homeViewModel: HomeViewModel
     private var selectedImageUri: Uri? = null
+
     private val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
+            Log.d("AddStories", "Image selected URI: $it")
             showLoading(true)
             Glide.with(this)
                 .load(it)
                 .into(binding.imageView)
             showLoading(false)
-            selectedImageUri = uri
-        }
+            selectedImageUri = it
+        } ?: Log.e("AddStories", "Failed to pick image")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,21 +54,23 @@ class AddStories : AppCompatActivity() {
         setContentView(binding.root)
 
         val factory = ViewModelFactory(this)
-        storiesViewModel = ViewModelProvider(this, factory)[StoriesViewModel::class.java]
+        homeViewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
 
-
-        storiesViewModel.uploadSuccess.observe(this) { response ->
+        homeViewModel.uploadSuccess.observe(this) { response ->
             if (response != null && !response.error) {
-                //To Do
+                // Navigate to home
+                val intent = Intent(this@AddStories, HomeActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+                finish()
             }
         }
 
-        storiesViewModel.error.observe(this) { errorMessage ->
+        homeViewModel.error.observe(this) { errorMessage ->
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
         }
 
-
-        storiesViewModel.isLoading.observe(this) { isLoading ->
+        homeViewModel.isLoading.observe(this) { isLoading ->
             showLoading(isLoading)
         }
 
@@ -81,7 +87,6 @@ class AddStories : AppCompatActivity() {
         }
 
         checkPermissions()
-
     }
 
     private fun checkPermissions() {
@@ -103,6 +108,7 @@ class AddStories : AppCompatActivity() {
         }
 
         if (permissionsNeeded.isNotEmpty()) {
+            Log.d("AddStories", "Requesting permissions: $permissionsNeeded")
             ActivityCompat.requestPermissions(this, permissionsNeeded.toTypedArray(), 100)
         }
     }
@@ -116,9 +122,8 @@ class AddStories : AppCompatActivity() {
 
         if (requestCode == 100) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Get
+                Log.d("AddStories", "Permissions granted")
             } else {
-                // Abort, do
                 Toast.makeText(
                     this,
                     "Permission is required to use camera and gallery",
@@ -128,34 +133,21 @@ class AddStories : AppCompatActivity() {
         }
     }
 
-    private fun showImage() {
-        selectedImageUri?.let {
-            Log.d("Image URI", "showImage: $it")
-            binding.imageView.setImageURI(it)
-        }
-    }
-
-    private val launcherIntentCamera = registerForActivityResult(
-        ActivityResultContracts.TakePicture()
-    ) { isSuccess ->
-        if (isSuccess) {
-            showImage()
-        } else {
-            selectedImageUri = null
-        }
-    }
-
     private fun saveStory() {
         val descriptionText = binding.descriptionEditText.text.toString()
-        if (descriptionText.isBlank() || selectedImageUri == null) {
-            showError("Descriptions and images cannot be empty")
+        if (descriptionText.isBlank()) {
+            showError("Description cannot be empty")
             return
+        }
 
+        if (selectedImageUri == null) {
+            showError("Image must be selected")
+            return
         }
 
         val file = getFileFromUri(selectedImageUri)
         if (file == null) {
-            showError("Invalid image")
+            showError("Failed to process selected image")
             return
         }
 
@@ -164,25 +156,7 @@ class AddStories : AppCompatActivity() {
         val description = descriptionText.toRequestBody("text/plain".toMediaTypeOrNull())
 
         lifecycleScope.launch {
-            storiesViewModel.uploadStories(body, description)
-        }
-
-        storiesViewModel.uploadSuccess.observe(this) { response ->
-            if (response != null && !response.error) {
-                Toast.makeText(
-                    this@AddStories,
-                    "Story successfully uploaded",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                val intent = Intent(this@AddStories, StoriesActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-                finish()
-            } else {
-                Toast.makeText(this@AddStories, "Upload gagal, coba lagi", Toast.LENGTH_SHORT)
-                    .show()
-            }
+            homeViewModel.uploadStories(body, description)
         }
     }
 
@@ -197,26 +171,44 @@ class AddStories : AppCompatActivity() {
     private fun getFileFromUri(uri: Uri?): File? {
         if (uri == null) return null
 
-        val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri, filePathColumn, null, null, null)
-
-        cursor?.let {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndex(filePathColumn[0])
-                val filePath = it.getString(columnIndex)
-                it.close()
-                return File(filePath)
+        return try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val tempFile = File.createTempFile("temp_image", ".jpg", cacheDir)
+            tempFile.outputStream().use { outputStream ->
+                inputStream?.copyTo(outputStream)
             }
-            it.close()
+            inputStream?.close()
+            tempFile
+        } catch (e: Exception) {
+            Log.e("AddStories", "Error converting URI to file: ${e.message}")
+            null
         }
-
-        return null
     }
-
 
     private fun startCamera() {
         selectedImageUri = getImageUri(this)
+        if (selectedImageUri == null) {
+            showError("Failed to create URI for camera")
+            return
+        }
         launcherIntentCamera.launch(selectedImageUri!!)
+    }
+
+    private val launcherIntentCamera = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { isSuccess ->
+        if (isSuccess) {
+            showImage()
+        } else {
+            selectedImageUri = null
+        }
+    }
+
+    private fun showImage() {
+        selectedImageUri?.let {
+            Log.d("AddStories", "Showing image: $it")
+            binding.imageView.setImageURI(it)
+        }
     }
 
     private fun showError(message: String) {
@@ -226,6 +218,4 @@ class AddStories : AppCompatActivity() {
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
-
-
 }

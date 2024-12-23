@@ -28,7 +28,7 @@
             android:name=".ui.story.StoriesDetail"
             android:exported="false" />
         <activity
-            android:name=".ui.story.StoriesActivity"
+            android:name=".ui.home.HomeActivity"
             android:exported="false" />
         <activity
             android:name=".ui.welcome.WelcomeActivity"

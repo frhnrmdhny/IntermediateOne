@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.dicoding.picodiploma.loginwithanimation.di.Injection
 import com.dicoding.picodiploma.loginwithanimation.ui.main.MainViewModel
 import com.dicoding.picodiploma.loginwithanimation.ui.story.StoriesDetailViewModel
-import com.dicoding.picodiploma.loginwithanimation.ui.story.StoriesViewModel
+import com.dicoding.picodiploma.loginwithanimation.ui.home.HomeViewModel
 
 class ViewModelFactory(
     private val context: Context,
@@ -23,12 +23,12 @@ class ViewModelFactory(
                 AuthenticationViewModel(Injection.provideRepository(context)) as T
             }
 
-            modelClass.isAssignableFrom(StoriesViewModel::class.java) -> {
-                StoriesViewModel(Injection.provideStoryRepository(context)) as T
+            modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
+                HomeViewModel(Injection.provideStoryRepository(context)) as T
             }
 
             modelClass.isAssignableFrom(StoriesDetailViewModel::class.java) -> {
-                StoriesViewModel(Injection.provideStoryRepository(context)) as T
+                HomeViewModel(Injection.provideStoryRepository(context)) as T
             }
 
             else -> throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)

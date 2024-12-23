@@ -1,8 +1,10 @@
 package com.dicoding.picodiploma.loginwithanimation.ui.welcome
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +22,15 @@ class WelcomeActivity : AppCompatActivity() {
 
         setupView()
         setupAction()
+        playAnimation()
+    }
+
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 2000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
     }
 
     private fun setupView() {

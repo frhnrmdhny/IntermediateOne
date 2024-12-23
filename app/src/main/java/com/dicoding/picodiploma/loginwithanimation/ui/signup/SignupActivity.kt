@@ -1,6 +1,7 @@
 package com.dicoding.picodiploma.loginwithanimation.ui.signup
 
 
+import android.animation.ObjectAnimator
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -29,6 +30,15 @@ class SignupActivity : AppCompatActivity() {
 
         setupView()
         setupAction()
+        playAnimation()
+    }
+
+    private fun playAnimation() {
+        ObjectAnimator.ofFloat(binding.imageView, View.TRANSLATION_X, -30f, 30f).apply {
+            duration = 4000
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+        }.start()
     }
 
     private fun setupView() {

@@ -1,11 +1,11 @@
-package com.dicoding.picodiploma.loginwithanimation.ui.story
+package com.dicoding.picodiploma.loginwithanimation.ui.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import com.dicoding.picodiploma.loginwithanimation.data.StoryRepository
+import com.dicoding.picodiploma.loginwithanimation.data.StoriesRepository
 import com.dicoding.picodiploma.loginwithanimation.data.remote.response.AddStoryResponse
 import com.dicoding.picodiploma.loginwithanimation.data.remote.response.ListStoryItem
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
-class StoriesViewModel(private val storiesRepository: StoryRepository) : ViewModel() {
+class HomeViewModel(private val storiesRepository: StoriesRepository) : ViewModel() {
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
@@ -44,12 +44,10 @@ class StoriesViewModel(private val storiesRepository: StoryRepository) : ViewMod
                 val response = storiesRepository.uploadStories(description, photo)
                 _uploadSuccess.postValue(response)
             } catch (e: Exception) {
-                _error.postValue("Gagal mengunggah cerita: ${e.message}")
+                _error.postValue("Failed to upload story: ${e.message}")
             } finally {
                 _isLoading.postValue(false)
             }
         }
     }
-
-
 }

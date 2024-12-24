@@ -12,12 +12,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivitySignupBinding
-import com.dicoding.picodiploma.loginwithanimation.ui.AuthenticationViewModel
 import com.dicoding.picodiploma.loginwithanimation.ui.ViewModelFactory
 
 class SignupActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupBinding
-    private lateinit var signView: AuthenticationViewModel
+    private lateinit var signView: SignupViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +25,7 @@ class SignupActivity : AppCompatActivity() {
 
         signView = ViewModelProvider(
             this, ViewModelFactory(this)
-        )[AuthenticationViewModel::class.java]
+        )[SignupViewModel::class.java]
 
         setupView()
         setupAction()

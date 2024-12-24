@@ -9,13 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dicoding.picodiploma.loginwithanimation.data.remote.response.ListStoryItem
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityStoriesDetailBinding
+import com.dicoding.picodiploma.loginwithanimation.databinding.ItemLayoutBinding
 
 class StoriesAdapter :
     PagingDataAdapter<ListStoryItem, StoriesAdapter.StoryViewHolder>(StoryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
         val binding =
-            ActivityStoriesDetailBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return StoryViewHolder(binding)
     }
 
@@ -26,16 +27,16 @@ class StoriesAdapter :
         }
     }
 
-    inner class StoryViewHolder(private val binding: ActivityStoriesDetailBinding) :
+    inner class StoryViewHolder(private val binding: ItemLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(story: ListStoryItem) {
-            binding.storyName.text = story.name
+            binding.storyTitle.text = story.name
             binding.storyDescription.text = story.description
 
             Glide.with(binding.root.context)
                 .load(story.photoUrl)
-                .into(binding.storyImage)
+                .into(binding.ivStoryLogo)
 
             binding.root.setOnClickListener {
                 val intent = Intent(binding.root.context, StoriesDetail::class.java)
@@ -44,6 +45,7 @@ class StoriesAdapter :
             }
 
         }
+
     }
 
     class StoryDiffCallback : DiffUtil.ItemCallback<ListStoryItem>() {

@@ -53,8 +53,8 @@ class UserRepository private constructor(
         return userPreference.getSession()
     }
 
-    suspend fun logout() {
-        userPreference.logout()
+    fun getUserSession(): Flow<UserModel> {
+        return userPreference.getSession()
     }
 
     companion object {

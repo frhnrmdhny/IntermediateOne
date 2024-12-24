@@ -58,7 +58,7 @@ class AddStories : AppCompatActivity() {
 
         homeViewModel.uploadSuccess.observe(this) { response ->
             if (response != null && !response.error) {
-                // Navigate to home
+                Toast.makeText(this, "Success added story", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this@AddStories, HomeActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)

@@ -15,13 +15,12 @@ import com.dicoding.picodiploma.loginwithanimation.R
 import com.dicoding.picodiploma.loginwithanimation.data.pref.UserModel
 import com.dicoding.picodiploma.loginwithanimation.data.remote.Results
 import com.dicoding.picodiploma.loginwithanimation.databinding.ActivityLoginBinding
-import com.dicoding.picodiploma.loginwithanimation.ui.AuthenticationViewModel
 import com.dicoding.picodiploma.loginwithanimation.ui.ViewModelFactory
 import com.dicoding.picodiploma.loginwithanimation.ui.home.HomeActivity
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var loginView: AuthenticationViewModel
+    private lateinit var loginView: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
         loginView = ViewModelProvider(
             this,
             ViewModelFactory(this)
-        )[AuthenticationViewModel::class.java]
+        )[LoginViewModel::class.java]
 
         setupView()
         setupAction()

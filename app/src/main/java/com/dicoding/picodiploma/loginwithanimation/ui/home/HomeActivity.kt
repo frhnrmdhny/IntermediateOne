@@ -3,6 +3,7 @@ package com.dicoding.picodiploma.loginwithanimation.ui.home
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -35,6 +36,8 @@ class HomeActivity : AppCompatActivity() {
         binding.rvStory.layoutManager = LinearLayoutManager(this)
         storiesAdapter = StoriesAdapter()
         binding.rvStory.adapter = storiesAdapter
+
+
 
         homeViewModel =
             ViewModelProvider(this, ViewModelFactory(this)).get(HomeViewModel::class.java)
@@ -100,6 +103,4 @@ class HomeActivity : AppCompatActivity() {
             finish()
         }
     }
-
-
 }
